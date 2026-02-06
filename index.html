@@ -3,46 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>تطبيق شقاوچية - لايف</title>
+    <title>شقاوچية لايف</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body { background-color: #0f0f0f; color: white; font-family: sans-serif; }
         .video-container { width: 100%; max-width: 400px; height: 300px; background: #222; border-radius: 20px; border: 2px solid #d4af37; overflow: hidden; position: relative; }
         video { width: 100%; height: 100%; object-fit: cover; }
-        .btn-gold { background: linear-gradient(to right, #d4af37, #f2d06b); color: black; font-weight: bold; padding: 12px 24px; rounded-xl: 15px; transition: 0.3s; }
+        .btn-gold { background: linear-gradient(to right, #d4af37, #f2d06b); color: black; font-weight: bold; padding: 12px 24px; border-radius: 15px; }
     </style>
 </head>
 <body class="flex flex-col items-center justify-center min-h-screen p-4">
-
     <h1 class="text-3xl font-bold text-yellow-500 mb-6">🎙️ شقاوچية لايف</h1>
-
     <div class="video-container mb-6 shadow-2xl">
         <video id="myVideo" autoplay playsinline muted></video>
-        <div id="placeholder" class="absolute inset-0 flex items-center justify-center text-gray-500">
-            الكاميرا متوقفة
-        </div>
+        <div id="placeholder" class="absolute inset-0 flex items-center justify-center text-gray-500">الكاميرا متوقفة</div>
     </div>
-
     <div class="flex gap-4">
-        <button onclick="startCamera()" class="btn-gold rounded-full shadow-lg">تشغيل الكاميرا</button>
-        <button onclick="stopCamera()" class="bg-red-600 px-6 py-3 rounded-full font-bold">إيقاف</button>
+        <button onclick="startCamera()" class="btn-gold shadow-lg">تشغيل الكاميرا</button>
+        <button onclick="stopCamera()" class="bg-red-600 px-6 py-3 rounded-xl font-bold">إيقاف</button>
     </div>
-
-    <p class="mt-8 text-gray-400 text-sm">أهلاً بك يا صلاح في تطبيقك الخاص</p>
-
     <script>
         let stream;
         async function startCamera() {
             try {
                 stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-                const videoElement = document.getElementById('myVideo');
-                videoElement.srcObject = stream;
+                document.getElementById('myVideo').srcObject = stream;
                 document.getElementById('placeholder').style.display = 'none';
-            } catch (err) {
-                alert("يرجى إعطاء صلاحية الكاميرا: " + err);
-            }
+            } catch (err) { alert("يرجى إعطاء صلاحية الكاميرا"); }
         }
-
         function stopCamera() {
             if (stream) {
                 stream.getTracks().forEach(track => track.stop());
