@@ -3,93 +3,120 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>شقاوچية - Hello Yo Style</title>
+    <title>شقاوچية VIP</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        body { background: #0a0a0a; color: white; font-family: 'Segoe UI', sans-serif; overflow-x: hidden; }
-        .app-bg { background: linear-gradient(180deg, #121212 0%, #000000 100%); }
-        .gold-border { border: 1px solid rgba(212, 175, 55, 0.3); }
-        .room-active { background: linear-gradient(145deg, #1e1e1e, #111); border-radius: 25px; }
-        .nav-bar { background: rgba(15, 15, 15, 0.98); border-top: 1px solid #222; }
-        .mic-main { background: linear-gradient(45deg, #FFD700, #DAA520); box-shadow: 0 0 20px rgba(218, 165, 32, 0.5); }
-        .gift-btn { background: rgba(255, 255, 255, 0.1); border-radius: 50%; width: 45px; height: 45px; display: flex; items-center; justify-content: center; }
-        .user-slot { display: flex; flex-direction: column; align-items: center; gap: 5px; }
-        .avatar { width: 60px; height: 60px; border-radius: 50%; border: 2px solid #d4af37; background: #333; }
+        :root { --gold: #d4af37; --dark-bg: #050505; }
+        body { background-color: var(--dark-bg); color: white; font-family: sans-serif; margin: 0; padding: 0; overflow-x: hidden; }
+        
+        /* تجميل البطاقات */
+        .room-card {
+            background: linear-gradient(145deg, #151515, #0a0a0a);
+            border-radius: 20px;
+            border: 1px solid #222;
+            transition: 0.3s;
+        }
+        .room-card:active { transform: scale(0.95); border-color: var(--gold); }
+
+        /* القائمة السفلية الاحترافية */
+        .nav-bar {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            background: rgba(10, 10, 10, 0.95);
+            backdrop-filter: blur(10px);
+            display: flex;
+            justify-content: space-around;
+            padding: 15px 0;
+            border-top: 1px solid #222;
+            z-index: 100;
+        }
+        .nav-item { display: flex; flex-direction: column; align-items: center; color: #666; font-size: 12px; }
+        .nav-item.active { color: var(--gold); }
+        .nav-item i { font-size: 20px; margin-bottom: 4px; }
+
+        /* تأثير النبض للمايك */
+        .main-mic {
+            width: 60px; height: 60px;
+            background: linear-gradient(45deg, var(--gold), #f9d976);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            margin-top: -35px;
+            border: 5px solid var(--dark-bg);
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.4);
+            color: black;
+        }
     </style>
 </head>
-<body class="app-bg min-h-screen">
+<body>
 
-    <div class="p-5 flex justify-between items-center bg-[#111] shadow-xl">
-        <div class="flex items-center gap-2">
-            <div class="w-8 h-8 bg-yellow-500 rounded-lg flex items-center justify-center text-black font-bold">ش</div>
-            <h1 class="text-xl font-black tracking-widest text-yellow-500">شقاوچية</h1>
+    <div class="p-5 flex justify-between items-center bg-[#0a0a0a]">
+        <div>
+            <p class="text-gray-400 text-xs">مرحباً بك،</p>
+            <h1 class="text-lg font-bold">صلاح الملك 👑</h1>
         </div>
-        <div class="flex gap-5 text-gray-400">
-            <i class="fas fa-search"></i>
-            <i class="fas fa-crown text-yellow-500"></i>
+        <div class="flex gap-4">
+            <div class="relative"><i class="fas fa-bell text-xl"></i><span class="absolute -top-1 -right-1 bg-red-500 w-2 h-2 rounded-full"></span></div>
+            <i class="fas fa-cog text-xl"></i>
         </div>
     </div>
 
-    <div class="p-4">
-        <div class="room-active p-6 gold-border shadow-2xl relative overflow-hidden">
-            <div class="flex justify-between items-start mb-8">
-                <div>
-                    <h2 class="text-lg font-bold">غرفة صلاح الملكية 👑</h2>
-                    <span class="text-[10px] bg-red-600 px-2 py-0.5 rounded-full">LIVE</span>
+    <div class="px-5 mb-5">
+        <h2 class="text-sm font-bold text-gray-400 mb-3 uppercase tracking-wider">الغرف الشائعة</h2>
+        <div class="grid grid-cols-2 gap-4">
+            <div class="room-card p-4">
+                <div class="flex justify-between items-start mb-4">
+                    <div class="w-10 h-10 rounded-xl bg-yellow-600 flex items-center justify-center text-black font-bold">VIP</div>
+                    <span class="text-[10px] bg-red-600 px-2 py-0.5 rounded text-white">LIVE</span>
                 </div>
-                <div class="flex -space-x-2">
-                    <div class="w-6 h-6 rounded-full bg-blue-500 border border-black text-[8px] flex items-center justify-center">👤</div>
-                    <div class="w-6 h-6 rounded-full bg-green-500 border border-black text-[8px] flex items-center justify-center">👤</div>
-                    <div class="w-6 h-6 rounded-full bg-gray-700 border border-black text-[8px] flex items-center justify-center">+12</div>
-                </div>
+                <h3 class="font-bold text-sm">مجلس النشامى</h3>
+                <p class="text-xs text-gray-500 mt-1"><i class="fas fa-user-friends mr-1"></i> 1.2K شخص</p>
             </div>
-
-            <div class="grid grid-cols-4 gap-y-8 mb-4">
-                <div class="user-slot">
-                    <div class="avatar flex items-center justify-center text-2xl">👑</div>
-                    <span class="text-[10px]">المضيف</span>
+            <div class="room-card p-4">
+                <div class="flex justify-between items-start mb-4">
+                    <div class="w-10 h-10 rounded-xl bg-purple-600 flex items-center justify-center text-white font-bold">G</div>
+                    <span class="text-[10px] bg-gray-600 px-2 py-0.5 rounded text-white">مطفي</span>
                 </div>
-                <div class="user-slot">
-                    <div class="avatar flex items-center justify-center opacity-30 text-xl"><i class="fas fa-plus"></i></div>
-                    <span class="text-[10px]">فارغ</span>
-                </div>
-                <div class="user-slot">
-                    <div class="avatar flex items-center justify-center opacity-30 text-xl"><i class="fas fa-plus"></i></div>
-                    <span class="text-[10px]">فارغ</span>
-                </div>
-                <div class="user-slot">
-                    <div class="avatar flex items-center justify-center opacity-30 text-xl"><i class="fas fa-plus"></i></div>
-                    <span class="text-[10px]">فارغ</span>
-                </div>
+                <h3 class="font-bold text-sm">عشاق الطرب</h3>
+                <p class="text-xs text-gray-500 mt-1"><i class="fas fa-user-friends mr-1"></i> 850 شخص</p>
             </div>
         </div>
     </div>
 
-    <div class="px-6 py-2 h-40 overflow-y-auto text-sm space-y-2 text-gray-300">
-        <p><span class="text-yellow-500 font-bold">نظام:</span> أهلاً بكم في تطبيق شقاوچية!</p>
-        <p><span class="text-blue-400 font-bold">أحمد:</span> منور يا صلاح</p>
-        <p><span class="text-pink-400 font-bold">سارة:</span> تطبيق روعة ✨</p>
+    <div class="px-5 mb-24">
+        <div class="w-full h-32 rounded-3xl overflow-hidden relative">
+            <img src="https://img.freepik.com/free-vector/abstract-luxury-gold-background_23-2148411754.jpg" class="w-full h-full object-cover opacity-50">
+            <div class="absolute inset-0 flex flex-col justify-center px-6">
+                <h3 class="text-xl font-black text-yellow-500 italic">مسابقة شقاوچية</h3>
+                <p class="text-xs">اربح هدايا ملكية الليلة الساعة 9</p>
+            </div>
+        </div>
     </div>
 
-    <div class="fixed bottom-0 w-full nav-bar h-20 flex justify-around items-center px-4 pb-2">
-        <div class="gift-btn text-yellow-500"><i class="fas fa-gift text-xl"></i></div>
-        <div class="gift-btn text-blue-400"><i class="fas fa-comment"></i></div>
+    <nav class="nav-bar">
+        <div class="nav-item active">
+            <i class="fas fa-home"></i>
+            <span>الرئيسية</span>
+        </div>
+        <div class="nav-item">
+            <i class="fas fa-compass"></i>
+            <span>اكتشف</span>
+        </div>
         
-        <button onclick="toggleMic()" id="micBtn" class="w-16 h-16 mic-main rounded-full flex items-center justify-center text-black text-2xl border-4 border-[#0a0a0a] -mt-10">
-            <i class="fas fa-microphone"></i>
-        </button>
+        <div class="main-mic">
+            <i class="fas fa-microphone text-2xl"></i>
+        </div>
 
-        <div class="gift-btn text-purple-400"><i class="fas fa-magic"></i></div>
-        <div class="gift-btn text-red-400"><i class="fas fa-heart"></i></div>
-    </div>
+        <div class="nav-item">
+            <i class="fas fa-comment-dots"></i>
+            <span>الدردشة</span>
+        </div>
+        <div class="nav-item">
+            <i class="fas fa-user"></i>
+            <span>حسابي</span>
+        </div>
+    </nav>
 
-    <script>
-        function toggleMic() {
-            const btn = document.getElementById('micBtn');
-            btn.classList.toggle('bg-red-500');
-            alert("تم تفعيل المايكروفون في غرفة صلاح");
-        }
-    </script>
 </body>
 </html>
