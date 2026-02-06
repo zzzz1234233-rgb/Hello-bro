@@ -2,42 +2,85 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>شقاوچية لايف</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>شقاوچية - غرف الدردشة الصوتية</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        body { background-color: #0f0f0f; color: white; font-family: sans-serif; }
-        .video-container { width: 100%; max-width: 400px; height: 300px; background: #222; border-radius: 20px; border: 2px solid #d4af37; overflow: hidden; position: relative; }
-        video { width: 100%; height: 100%; object-fit: cover; }
-        .btn-gold { background: linear-gradient(to right, #d4af37, #f2d06b); color: black; font-weight: bold; padding: 12px 24px; border-radius: 15px; }
+        body { background: #050505; color: white; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        .app-gradient { background: linear-gradient(180deg, #1a1a1a 0%, #050505 100%); }
+        .room-card { background: #1a1a1a; border: 1px solid #333; border-radius: 20px; transition: 0.3s; }
+        .room-card:active { transform: scale(0.95); background: #222; }
+        .gold-text { background: linear-gradient(to bottom, #d4af37, #f2d06b); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .bottom-nav { background: rgba(20, 20, 20, 0.95); backdrop-filter: blur(10px); border-top: 1px solid #333; }
+        .mic-btn { background: linear-gradient(45deg, #d4af37, #b8860b); box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3); }
     </style>
 </head>
-<body class="flex flex-col items-center justify-center min-h-screen p-4">
-    <h1 class="text-3xl font-bold text-yellow-500 mb-6">🎙️ شقاوچية لايف</h1>
-    <div class="video-container mb-6 shadow-2xl">
-        <video id="myVideo" autoplay playsinline muted></video>
-        <div id="placeholder" class="absolute inset-0 flex items-center justify-center text-gray-500">الكاميرا متوقفة</div>
+<body class="app-gradient min-h-screen pb-20">
+
+    <div class="p-4 flex justify-between items-center bg-[#111]">
+        <h1 class="text-2xl font-bold gold-text">شقاوچية</h1>
+        <div class="flex gap-4">
+            <i class="fas fa-search text-xl"></i>
+            <i class="fas fa-bell text-xl text-yellow-500"></i>
+        </div>
     </div>
-    <div class="flex gap-4">
-        <button onclick="startCamera()" class="btn-gold shadow-lg">تشغيل الكاميرا</button>
-        <button onclick="stopCamera()" class="bg-red-600 px-6 py-3 rounded-xl font-bold">إيقاف</button>
+
+    <div class="p-4">
+        <div class="w-full h-32 bg-gradient-to-r from-yellow-700 to-yellow-900 rounded-3xl p-4 flex items-center justify-between shadow-lg">
+            <div>
+                <h2 class="text-xl font-bold">غرفة النجوم ✨</h2>
+                <p class="text-xs opacity-75">انضم الآن واستمتع بالدردشة</p>
+            </div>
+            <button class="bg-black text-yellow-500 px-4 py-2 rounded-full text-sm font-bold">دخول</button>
+        </div>
     </div>
+
+    <div class="p-4 grid grid-cols-2 gap-4">
+        <div class="room-card p-4 relative overflow-hidden">
+            <div class="flex items-center gap-2 mb-2">
+                <div class="w-10 h-10 bg-yellow-600 rounded-full flex items-center justify-center text-xl">🎙️</div>
+                <div class="text-xs font-bold">ديوانية صلاح</div>
+            </div>
+            <p class="text-[10px] text-gray-400">🔥 1,240 مستمع</p>
+            <div class="absolute bottom-0 right-0 p-2 opacity-10 text-4xl italic">LIVE</div>
+        </div>
+
+        <div class="room-card p-4">
+            <div class="flex items-center gap-2 mb-2">
+                <div class="w-10 h-10 bg-purple-600 rounded-full flex items-center justify-center text-xl">🎶</div>
+                <div class="text-xs font-bold">أغاني وطلب</div>
+            </div>
+            <p class="text-[10px] text-gray-400">👤 850 متواجد</p>
+        </div>
+    </div>
+
+    <div class="fixed bottom-0 w-full bottom-nav h-16 flex justify-around items-center z-50">
+        <div class="flex flex-col items-center text-yellow-500">
+            <i class="fas fa-home text-xl"></i>
+            <span class="text-[10px]">الرئيسية</span>
+        </div>
+        <div class="flex flex-col items-center text-gray-500">
+            <i class="fas fa-users text-xl"></i>
+            <span class="text-[10px]">الأصدقاء</span>
+        </div>
+        <div class="w-12 h-12 mic-btn rounded-full flex items-center justify-center text-white -mt-8 border-4 border-[#050505]">
+            <i class="fas fa-microphone text-xl"></i>
+        </div>
+        <div class="flex flex-col items-center text-gray-500">
+            <i class="fas fa-comment-dots text-xl"></i>
+            <span class="text-[10px]">الرسائل</span>
+        </div>
+        <div class="flex flex-col items-center text-gray-500">
+            <i class="fas fa-user text-xl"></i>
+            <span class="text-[10px]">أنا</span>
+        </div>
+    </div>
+
     <script>
-        let stream;
-        async function startCamera() {
-            try {
-                stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-                document.getElementById('myVideo').srcObject = stream;
-                document.getElementById('placeholder').style.display = 'none';
-            } catch (err) { alert("يرجى إعطاء صلاحية الكاميرا"); }
-        }
-        function stopCamera() {
-            if (stream) {
-                stream.getTracks().forEach(track => track.stop());
-                document.getElementById('myVideo').srcObject = null;
-                document.getElementById('placeholder').style.display = 'flex';
-            }
-        }
+        document.querySelector('.mic-btn').onclick = function() {
+            alert("أهلاً بك يا صلاح! جاري تهيئة الغرفة الصوتية...");
+        };
     </script>
 </body>
 </html>
