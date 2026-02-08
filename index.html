@@ -1,122 +1,192 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>شقاوچية VIP</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <style>
-        :root { --gold: #d4af37; --dark-bg: #050505; }
-        body { background-color: var(--dark-bg); color: white; font-family: sans-serif; margin: 0; padding: 0; overflow-x: hidden; }
-        
-        /* تجميل البطاقات */
-        .room-card {
-            background: linear-gradient(145deg, #151515, #0a0a0a);
-            border-radius: 20px;
-            border: 1px solid #222;
-            transition: 0.3s;
-        }
-        .room-card:active { transform: scale(0.95); border-color: var(--gold); }
+import React, { useState, useEffect } from "react";
+import { Switch, Route, useLocation } from "wouter";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { Toaster } from "sonner";
+import { 
+  Mic, MicOff, PhoneOff, Settings, Users, 
+  MessageSquare, Hand, Volume2 
+} from "lucide-react";
 
-        /* القائمة السفلية الاحترافية */
-        .nav-bar {
-            position: fixed;
-            bottom: 0;
-            width: 100%;
-            background: rgba(10, 10, 10, 0.95);
-            backdrop-filter: blur(10px);
-            display: flex;
-            justify-content: space-around;
-            padding: 15px 0;
-            border-top: 1px solid #222;
-            z-index: 100;
-        }
-        .nav-item { display: flex; flex-direction: column; align-items: center; color: #666; font-size: 12px; }
-        .nav-item.active { color: var(--gold); }
-        .nav-item i { font-size: 20px; margin-bottom: 4px; }
+// --- 1. محاكاة التنسيقات والرسوم المتحركة (بديلاً عن index.css) ---
+const GlobalStyles = () => (
+  <style>{`
+    :root {
+      --background: 222.2 84% 4.9%;
+      --foreground: 210 40% 98%;
+      --card: 222.2 84% 4.9%;
+      --card-foreground: 210 40% 98%;
+      --primary: 217.2 91.2% 59.8%;
+      --primary-foreground: 222.2 47.4% 11.2%;
+      --destructive: 0 62.8% 30.6%;
+      --destructive-foreground: 210 40% 98%;
+      --ring: 212.7 26.8% 83.9%;
+    }
+    
+    body {
+      background-color: hsl(var(--background));
+      color: hsl(var(--foreground));
+      font-family: 'Inter', sans-serif;
+      margin: 0;
+      overflow: hidden; /* لمنع التمرير في وضع التطبيق */
+    }
 
-        /* تأثير النبض للمايك */
-        .main-mic {
-            width: 60px; height: 60px;
-            background: linear-gradient(45deg, var(--gold), #f9d976);
-            border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            margin-top: -35px;
-            border: 5px solid var(--dark-bg);
-            box-shadow: 0 0 15px rgba(212, 175, 55, 0.4);
-            color: black;
-        }
-    </style>
-</head>
-<body>
+    /* تأثير النبض للمتحدث */
+    @keyframes pulse-ring {
+      0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.7); }
+      70% { transform: scale(1); box-shadow: 0 0 0 15px rgba(74, 222, 128, 0); }
+      100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(74, 222, 128, 0); }
+    }
+    
+    .speaking-animation {
+      animation: pulse-ring 2s infinite;
+    }
+  `}</style>
+);
 
-    <div class="p-5 flex justify-between items-center bg-[#0a0a0a]">
-        <div>
-            <p class="text-gray-400 text-xs">مرحباً بك،</p>
-            <h1 class="text-lg font-bold">صلاح الملك 👑</h1>
+// --- 2. مكونات واجهة المستخدم (Mock Components) ---
+
+// نموذج لمستخدم في الغرفة
+const participants = [
+  { id: 1, name: "أنت (المضيف)", role: "host", isMuted: false, isSpeaking: true, image: "https://i.pravatar.cc/150?u=1" },
+  { id: 2, name: "سارة أحمد", role: "speaker", isMuted: true, isSpeaking: false, image: "https://i.pravatar.cc/150?u=2" },
+  { id: 3, name: "خالد عمر", role: "listener", isMuted: true, isSpeaking: false, image: "https://i.pravatar.cc/150?u=3" },
+  { id: 4, name: "نورة علي", role: "listener", isMuted: true, isSpeaking: false, image: "https://i.pravatar.cc/150?u=4" },
+  { id: 5, name: "ضيف 1", role: "listener", isMuted: true, isSpeaking: false, image: null },
+];
+
+// مكون الأفاتار للمستخدم
+const UserAvatar = ({ user }: { user: any }) => {
+  return (
+    <div className="flex flex-col items-center justify-center space-y-2 p-4">
+      <div className={`relative rounded-full p-1 transition-all duration-300 ${user.isSpeaking ? "speaking-animation bg-green-500" : "bg-slate-800"}`}>
+        <div className="h-20 w-20 rounded-full overflow-hidden border-4 border-slate-900 bg-slate-700 flex items-center justify-center">
+          {user.image ? (
+            <img src={user.image} alt={user.name} className="h-full w-full object-cover" />
+          ) : (
+            <span className="text-xl font-bold text-slate-300">{user.name[0]}</span>
+          )}
         </div>
-        <div class="flex gap-4">
-            <div class="relative"><i class="fas fa-bell text-xl"></i><span class="absolute -top-1 -right-1 bg-red-500 w-2 h-2 rounded-full"></span></div>
-            <i class="fas fa-cog text-xl"></i>
-        </div>
+        {user.isMuted && (
+          <div className="absolute bottom-0 right-0 bg-slate-900 rounded-full p-1.5 border border-slate-700">
+            <MicOff className="w-4 h-4 text-red-500" />
+          </div>
+        )}
+      </div>
+      <div className="text-center">
+        <p className="font-semibold text-sm text-slate-200">{user.name}</p>
+        <span className="text-xs text-slate-500 capitalize">{user.role}</span>
+      </div>
     </div>
+  );
+};
 
-    <div class="px-5 mb-5">
-        <h2 class="text-sm font-bold text-gray-400 mb-3 uppercase tracking-wider">الغرف الشائعة</h2>
-        <div class="grid grid-cols-2 gap-4">
-            <div class="room-card p-4">
-                <div class="flex justify-between items-start mb-4">
-                    <div class="w-10 h-10 rounded-xl bg-yellow-600 flex items-center justify-center text-black font-bold">VIP</div>
-                    <span class="text-[10px] bg-red-600 px-2 py-0.5 rounded text-white">LIVE</span>
-                </div>
-                <h3 class="font-bold text-sm">مجلس النشامى</h3>
-                <p class="text-xs text-gray-500 mt-1"><i class="fas fa-user-friends mr-1"></i> 1.2K شخص</p>
-            </div>
-            <div class="room-card p-4">
-                <div class="flex justify-between items-start mb-4">
-                    <div class="w-10 h-10 rounded-xl bg-purple-600 flex items-center justify-center text-white font-bold">G</div>
-                    <span class="text-[10px] bg-gray-600 px-2 py-0.5 rounded text-white">مطفي</span>
-                </div>
-                <h3 class="font-bold text-sm">عشاق الطرب</h3>
-                <p class="text-xs text-gray-500 mt-1"><i class="fas fa-user-friends mr-1"></i> 850 شخص</p>
-            </div>
+// --- 3. صفحة الغرفة الصوتية (VoiceRoom) ---
+const VoiceRoom = () => {
+  const [micState, setMicState] = useState(true); // true = ON
+  const [isHandRaised, setIsHandRaised] = useState(false);
+  const [, setLocation] = useLocation();
+
+  return (
+    <div className="flex flex-col h-screen bg-slate-950 text-white relative">
+      <GlobalStyles />
+      
+      {/* Header */}
+      <header className="flex items-center justify-between px-6 py-4 border-b border-slate-800 bg-slate-950/50 backdrop-blur-md sticky top-0 z-10">
+        <div className="flex items-center space-x-3 rtl:space-x-reverse">
+          <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
+          <h1 className="text-lg font-bold">غرفة النقاش العام</h1>
+          <span className="bg-slate-800 text-slate-400 text-xs px-2 py-0.5 rounded-full">مباشر</span>
         </div>
+        <div className="flex items-center space-x-4 rtl:space-x-reverse">
+          <div className="flex items-center text-slate-400 text-sm">
+            <Users className="w-4 h-4 mr-2 ml-2" />
+            <span>{participants.length}</span>
+          </div>
+          <button className="p-2 hover:bg-slate-800 rounded-full transition">
+            <Settings className="w-5 h-5 text-slate-400" />
+          </button>
+        </div>
+      </header>
+
+      {/* Main Grid */}
+      <main className="flex-1 overflow-y-auto p-6">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 max-w-5xl mx-auto">
+          {participants.map((user) => (
+             <UserAvatar key={user.id} user={{...user, isMuted: user.id === 1 ? !micState : user.isMuted}} />
+          ))}
+        </div>
+      </main>
+
+      {/* Control Bar (Bottom) */}
+      <div className="p-6 pb-8 flex justify-center sticky bottom-0 z-20 pointer-events-none">
+        <div className="bg-slate-900/90 backdrop-blur-xl border border-slate-800 rounded-2xl px-6 py-3 flex items-center space-x-6 rtl:space-x-reverse shadow-2xl pointer-events-auto">
+          
+          <button 
+            onClick={() => setMicState(!micState)}
+            className={`p-4 rounded-full transition-all duration-200 ${micState ? 'bg-slate-800 hover:bg-slate-700 text-white' : 'bg-red-500/10 text-red-500 hover:bg-red-500/20'}`}
+          >
+            {micState ? <Mic className="w-6 h-6" /> : <MicOff className="w-6 h-6" />}
+          </button>
+
+          <button className="p-4 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 transition">
+            <Volume2 className="w-6 h-6" />
+          </button>
+
+          <button 
+            onClick={() => setIsHandRaised(!isHandRaised)}
+            className={`p-4 rounded-full transition ${isHandRaised ? 'bg-yellow-500/20 text-yellow-500' : 'bg-slate-800 hover:bg-slate-700 text-slate-300'}`}
+          >
+            <Hand className="w-6 h-6" />
+          </button>
+          
+          <button className="p-4 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 transition">
+            <MessageSquare className="w-6 h-6" />
+          </button>
+
+          <div className="w-px h-8 bg-slate-700 mx-2"></div>
+
+          <button 
+            onClick={() => setLocation('/login')}
+            className="px-6 py-3 bg-red-600 hover:bg-red-700 text-white rounded-full font-semibold flex items-center transition"
+          >
+            <PhoneOff className="w-5 h-5 mr-2 ml-2" />
+            <span>مغادرة</span>
+          </button>
+        </div>
+      </div>
     </div>
+  );
+};
 
-    <div class="px-5 mb-24">
-        <div class="w-full h-32 rounded-3xl overflow-hidden relative">
-            <img src="https://img.freepik.com/free-vector/abstract-luxury-gold-background_23-2148411754.jpg" class="w-full h-full object-cover opacity-50">
-            <div class="absolute inset-0 flex flex-col justify-center px-6">
-                <h3 class="text-xl font-black text-yellow-500 italic">مسابقة شقاوچية</h3>
-                <p class="text-xs">اربح هدايا ملكية الليلة الساعة 9</p>
-            </div>
-        </div>
-    </div>
+// --- 4. صفحات تسجيل الدخول الوهمية (Login/Signup Mocks) ---
+const Login = () => <div className="h-screen flex items-center justify-center bg-slate-950 text-white"><h1>صفحة تسجيل الدخول</h1></div>;
+const Signup = () => <div className="h-screen flex items-center justify-center bg-slate-950 text-white"><h1>صفحة إنشاء حساب</h1></div>;
 
-    <nav class="nav-bar">
-        <div class="nav-item active">
-            <i class="fas fa-home"></i>
-            <span>الرئيسية</span>
-        </div>
-        <div class="nav-item">
-            <i class="fas fa-compass"></i>
-            <span>اكتشف</span>
-        </div>
-        
-        <div class="main-mic">
-            <i class="fas fa-microphone text-2xl"></i>
-        </div>
+// --- 5. إعدادات التطبيق الرئيسية (Main App Config) ---
+const queryClient = new QueryClient();
 
-        <div class="nav-item">
-            <i class="fas fa-comment-dots"></i>
-            <span>الدردشة</span>
-        </div>
-        <div class="nav-item">
-            <i class="fas fa-user"></i>
-            <span>حسابي</span>
-        </div>
-    </nav>
+function Router() {
+  return (
+    <Switch>
+      <Route path="/" component={VoiceRoom} />
+      <Route path="/room" component={VoiceRoom} />
+      <Route path="/login" component={Login} />
+      <Route path="/signup" component={Signup} />
+      <Route>
+        <VoiceRoom />
+      </Route>
+    </Switch>
+  );
+}
 
-</body>
-</html>
+function App() {
+  return (
+    <QueryClientProvider client={queryClient}>
+        {/* تم استخدام Toaster من Sonner مباشرة */}
+        <Toaster position="top-center" richColors theme="dark" />
+        <Router />
+    </QueryClientProvider>
+  );
+}
+
+export default App;
